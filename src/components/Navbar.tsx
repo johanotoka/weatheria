@@ -21,9 +21,9 @@ export default function Navbar({}: Props) {
                 <p className='text-slate-900/80 text-sm'>Toronto</p>
                 <div>
                     {/* SearchBar */}
-                    <SearchBar />
+                    <SearchBar value={''} onChange={undefined} onSubmit={undefined} />
                 </div>
-            </section>
+            </section> 
         </div>
     </div>
   )
