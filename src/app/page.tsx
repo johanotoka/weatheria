@@ -3,12 +3,15 @@
 import Navbar from "@/components/Navbar";
 import { useQuery } from "react-query";
 import axios from "axios";
-import { format } from "date-fns";
+import { format, fromUnixTime } from "date-fns";
 import { parseISO } from "date-fns/parseISO";
 import Container from "@/components/Container";
 import { convertKelvinToCelcius } from "@/utils/convertKelvinToCelcius";
 import WeatherIcon from "@/components/WeatherIcon";
 import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
+import WeatherDetails from "@/components/WeatherDetails";
+import { meterToKilometer } from "@/utils/meterToKilometer";
+import { mPerSecToKmPerH } from "@/utils/mPerSecToKmPerH";
 
 interface WeatherDetail {
   dt: number;
@@ -72,7 +75,7 @@ export default function Home() {
 
   const { isLoading, error, data } = useQuery<WeatherData>('repoData', async () =>
     {
-      const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=toronto&appid=${process.env.NEXT_PUBLIC_WEATHERIA_KEY}&cnt=7`);
+      const { data } = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=toronto&appid=${process.env.NEXT_PUBLIC_WEATHERIA_KEY}&cnt=8`);
       return data;
     }
   )
@@ -84,12 +87,13 @@ export default function Home() {
     <p className='animate-bounce'>Loading...</p>
   </div>;
 
-  // if (error) return 'An error has occurred: ' + error.message
+  if (error) return 'An error has occurred: ' + (error as Error).message
 
   return (
     <div className='flex flex-col gap-4 bg-gray-100 min-h-screen'>
       <Navbar />
       <main className='px-3 max-w-7xl mx-auto flex flex-col gap-9 w-full pb-10 pt-4'>
+        
         {/* Today's data */}
         <section className='space-y-4'>
           <div className='space-y-2'>
@@ -125,9 +129,30 @@ export default function Home() {
               </Container>
             </div>
           </div>
+
+          {/* Weather details */}
+          <div className='flex gap-4'>
+            <Container className='w-fit justify-center flex-col px-4 items-center'>
+              <p className='capitalize text-center'> {today?.weather[0].description} </p>
+              <WeatherIcon iconName={getDayOrNightIcon(today?.weather[0].icon ?? '', today?.dt_txt ?? '')} />
+            </Container>
+            <Container className='bg-orange-300/80 px-5 gap-4 justify-between overflow-x-auto'>
+              <WeatherDetails 
+                visibility={meterToKilometer(today?.visibility ?? 10000)} 
+                humidity={`${today?.main.humidity}%`}
+                airPressure={`${today?.main.pressure} hPa`}
+                windSpeed={`${mPerSecToKmPerH(today?.wind.speed ?? 3.6)}`}
+                sunrise={format(fromUnixTime(data?.city.sunrise ?? 	1718445600), 'h:mm a')}
+                sunset={format(fromUnixTime(data?.city.sunset ?? 	1718488800), 'h:mm a')}
+                />
+            </Container>
+          </div>
         </section>
+
         {/* 7 day forcast data */}
-        <section>
+        <section className='flex w-full flex-col gap-4'>
+          <h2 className='text-2xl'>7 Day Forecast</h2>
+          
         </section>
       </main>
     </div>
