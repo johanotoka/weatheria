@@ -8,7 +8,6 @@ import SearchBar from './SearchBar';
 import axios from 'axios';
 import { loadingCityAtom, placeAtom } from '@/app/atom';
 import { useAtom } from 'jotai';
-import { se } from 'date-fns/locale';
 
 type Props = {location?: string;}
 
