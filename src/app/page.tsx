@@ -12,6 +12,7 @@ import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
 import WeatherDetails from "@/components/WeatherDetails";
 import { meterToKilometer } from "@/utils/meterToKilometer";
 import { mPerSecToKmPerH } from "@/utils/mPerSecToKmPerH";
+import ForecastWeatherDetail from "@/components/ForecastWeatherDetail";
 
 interface WeatherDetail {
   dt: number;
@@ -67,9 +68,6 @@ interface WeatherData {
     sunset: number;
   };
 }
-
-// https://api.openweathermap.org/data/2.5/forecast?q=toronto&appid=6f2f8486ca5dde950f7abb703f2a785d&cnt=6
-
 
 export default function Home() {
 
@@ -152,7 +150,7 @@ export default function Home() {
         {/* 7 day forcast data */}
         <section className='flex w-full flex-col gap-4'>
           <h2 className='text-2xl'>7 Day Forecast</h2>
-          
+          {/* <ForecastWeatherDetail /> */}
         </section>
       </main>
     </div>
