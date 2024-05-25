@@ -11,7 +11,7 @@ import { useAtom } from 'jotai';
 
 type Props = {location?: string;}
 
-const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+const API_KEY = process.env.NEXT_PUBLIC_WEATHERIA_KEY;
 
 export default function Navbar({ location }: Props) {
     const [city, setCity] = useState('');
@@ -22,12 +22,14 @@ export default function Navbar({ location }: Props) {
     const [place, setPlace] = useAtom(placeAtom);
     const [_, setLoadingCity] = useAtom(loadingCityAtom);
 
-    async function handleInputChange (value: string) {
+    async function handleInputChange(value: string) {
         setCity(value);
         if(value.length >= 3) {
             try {
-                const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${value}&appid=${API_KEY}`);
+                const response = await axios.get(`https://api.openweathermap.org/data/2.5/find?q=${value}&appid=${API_KEY}`);
+
                 const suggestions = response.data.list.map((item: any) => item.name);
+                console.log(suggestions);
                 setSuggestions(suggestions);
                 setShowSuggestions(true);
                 setError('');
@@ -35,22 +37,20 @@ export default function Navbar({ location }: Props) {
             catch (error) {
                 setSuggestions([]);
                 setShowSuggestions(false);
-                setError('Location not found');
             }
         }
         else {
             setSuggestions([]);
             setShowSuggestions(false);
-            setError('Location not found');
         }
     }
 
-    const handleSuggestionClick = (item: string) => {
-        setCity(item);
+    function handleSuggestionClick(value: string) {
+        setCity(value);
         setShowSuggestions(false);
     }
 
-    const handleSubmitSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    function handleSubmitSearch(e: React.FormEvent<HTMLFormElement>) {
         setLoadingCity(true);
         e.preventDefault();
         
@@ -70,7 +70,7 @@ export default function Navbar({ location }: Props) {
 
     function handleCurrentLocation() {
         if(navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(async(position) => {
+            navigator.geolocation.getCurrentPosition(async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
                     const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}`);
@@ -81,7 +81,6 @@ export default function Navbar({ location }: Props) {
                 }
                 catch (error) {
                     setLoadingCity(false);
-                    console.log(error);
                 }
             });
         }
@@ -95,7 +94,7 @@ export default function Navbar({ location }: Props) {
                         <h2 className='text-gray-500 text-3xl'>Weatheria</h2>
                         <PiSunHorizonFill className='text-3xl mt-1 text-orange-300'/>
                     </div>
-                    {/*  */}
+                    
                     <section className='flex gap-2 items-center'>
                         <MdMyLocation 
                             title='Your Current Location'
@@ -112,6 +111,7 @@ export default function Navbar({ location }: Props) {
                     </section> 
                 </div>
             </nav>
+
             <section className='flex max-w-7xl px-3 md:hidden'>
                  <div className='relative'>
                     {/* SearchBar */}
@@ -133,21 +133,19 @@ function SuggestionBox(
         showSuggestions: boolean;
         suggestions: string[];
         handleSuggestionClick: (item: string) => void;
-        error: string;
-    }
-) {
+        error: string
+    }) {
     return (
-        <>{(showSuggestions && suggestions.length > 0 && !error) && (
+        <>{(showSuggestions && suggestions.length > 1 || error) && (
             <ul className='mb-4 bg-white absolute border top-[44px] left-0 border-gray-300 rounded-md min-w-[200px] flex flex-col gap-1 px-2 py-2'>
                 {error && suggestions.length < 1 && (
                 <li className='cursor-pointer p-1 rounded hover:bg-gray-200'>{error}</li>
                 )}
-                {suggestions.map((item) => (
-                    <li key={item} onClick={() => handleSuggestionClick(item)} className='cursor-pointer p-1 rounded hover:bg-gray-200'>{item}</li>
+                {suggestions.map((item, index) => (
+                    <li key={index} onClick={() => handleSuggestionClick(item)} className='cursor-pointer p-1 rounded hover:bg-gray-200'>{item}</li>
                 ))}
             </ul>
         )}
         </>
     )
-        
 }

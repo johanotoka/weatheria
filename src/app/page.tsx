@@ -185,7 +185,7 @@ export default function Home() {
               temp_min={date?.main.temp_min ?? 0} 
               temp_max={date?.main.temp_max ?? 0} 
               description={date?.weather[0].description ?? ''} 
-              visibility={`${meterToKilometer(date?.visibility ?? 10000)} km`} 
+              visibility={`${meterToKilometer(date?.visibility ?? 10000)}`} 
               humidity={`${date?.main.humidity}%`}
               windSpeed={`${mPerSecToKmPerH(date?.wind.speed ?? 3.6)}`} 
               airPressure={`${date?.main.pressure} hPa`}
